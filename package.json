@@ -4,11 +4,11 @@
 		"build": "tsc -b tsconfig.build.json",
 		"watch": "npm run build && (npm run watch:base & npm run watch:vue & npm run watch:vue-preview & npm run watch:typescript-vue-plugin)",
 		"watch:base": "tsc -b tsconfig.build.json -w",
-		"watch:vscode": "cd ./packages/vscode-vue-preview && npm run watch",
+		"watch:vscode": "cd ./packages/vscode && npm run watch",
 		"prerelease": "npm run build",
 		"release": "npm run release:base && npm run release:vue && npm run release:pug && npm run release:typescript-vue-plugin",
 		"release:base": "lerna publish --exact --force-publish --yes --sync-workspace-lock",
-		"release:vscode": "cd ./packages/vscode-vue-preview && npm run release"
+		"release:vscode": "cd ./packages/vscode && npm run release"
 	},
 	"devDependencies": {
 		"@types/node": "latest",

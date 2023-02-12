@@ -9,7 +9,7 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--disable-extensions",
-				"--extensionDevelopmentPath=${workspaceRoot}/packages/vscode-vue-preview"
+				"--extensionDevelopmentPath=${workspaceRoot}/packages/vscode"
 			],
 			"outFiles": [
 				"${workspaceRoot}/*/*/out/**/*.js"

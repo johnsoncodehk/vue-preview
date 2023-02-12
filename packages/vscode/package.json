@@ -4,8 +4,8 @@
 	"version": "0.1.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/johnsoncodehk/volar.git",
-		"directory": "packages/vscode-vue-preview"
+		"url": "https://github.com/johnsoncodehk/vue-preview.git",
+		"directory": "packages/vscode"
 	},
 	"sponsor": {
 		"url": "https://github.com/sponsors/johnsoncodehk"

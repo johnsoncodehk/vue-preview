@@ -22,7 +22,7 @@ importers:
     devDependencies:
       '@types/ws': 8.5.4
 
-  packages/vscode-vue-preview:
+  packages/vscode:
     specifiers:
       '@types/vscode': 1.67.0
       '@vue-preview/core': 0.1.0
