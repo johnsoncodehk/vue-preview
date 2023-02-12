@@ -1,0 +1,10 @@
+{
+	"files": [],
+	"include": [],
+	"references": [
+		// Extensions
+		{
+			"path": "./packages/vscode-vue-preview/tsconfig.build.json"
+		}
+	]
+}

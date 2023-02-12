@@ -1,0 +1,26 @@
+{
+	"name": "@vue-preview/core",
+	"version": "0.1.0",
+	"license": "MIT",
+	"files": [
+		"bin",
+		"out/**/*.js",
+		"out/**/*.d.ts"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/johnsoncodehk/volar.git",
+		"directory": "packages/preview"
+	},
+	"main": "out/index.js",
+	"bin": {
+		"volar-preview-vite": "./bin/vite.js",
+		"volar-preview-nuxi": "./bin/nuxi.js"
+	},
+	"devDependencies": {
+		"@types/ws": "^8.5.4"
+	},
+	"dependencies": {
+		"ws": "^8.12.0"
+	}
+}
