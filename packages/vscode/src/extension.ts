@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'typesafe-path';
+import * as posix from 'typesafe-path/posix';
 import * as fs from './utils/fs';
 import * as preview from '@vue-preview/core';
 import { getLocalHostAvailablePort } from './utils/http';
@@ -9,9 +10,9 @@ import { quickPick } from './utils/quickPick';
 const htmlLs = html.getLanguageService();
 
 const enum PreviewType {
-	Webview = 'volar-webview',
-	ExternalBrowser = 'volar-start-server',
-	ExternalBrowser_Component = 'volar-component-preview',
+	Webview = 'vue-preview-webview',
+	ExternalBrowser = 'vue-preview-start-server',
+	ExternalBrowser_Component = 'vue-preview-component-preview',
 }
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -21,14 +22,14 @@ export async function activate(context: vscode.ExtensionContext) {
 	let updateComponentPreview: Function | undefined;
 
 	const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, -1);
-	statusBar.command = 'volar.previewMenu';
+	statusBar.command = 'vue-preview.previewMenu';
 	statusBar.backgroundColor = new vscode.ThemeColor('statusBarItem.warningBackground');
 	context.subscriptions.push(statusBar);
 
 	let connection: ReturnType<typeof preview.createPreviewConnection> | undefined;
 	let highlightDomElements = true;
 
-	const previewTerminal = vscode.window.terminals.find(terminal => terminal.name.startsWith('volar-preview:'));
+	const previewTerminal = vscode.window.terminals.find(terminal => terminal.name.startsWith('vue-preview:'));
 	if (previewTerminal) {
 		connection = preview.createPreviewConnection({
 			onGotoCode: handleGoToCode,
@@ -42,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		statusBar.show();
 	}
 	vscode.window.onDidOpenTerminal(e => {
-		if (e.name.startsWith('volar-preview:')) {
+		if (e.name.startsWith('vue-preview:')) {
 			connection = preview.createPreviewConnection({
 				onGotoCode: handleGoToCode,
 				getFileHref: (fileName) => {
@@ -56,7 +57,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 	vscode.window.onDidCloseTerminal(e => {
-		if (e.name.startsWith('volar-preview:')) {
+		if (e.name.startsWith('vue-preview:')) {
 			connection?.stop();
 			connection = undefined;
 			statusBar.hide();
@@ -115,7 +116,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					return;
 
 				const fileName = lastPreviewDocument.fileName as path.OsPath;
-				let terminal = vscode.window.terminals.find(terminal => terminal.name.startsWith('volar-preview:'));
+				let terminal = vscode.window.terminals.find(terminal => terminal.name.startsWith('vue-preview:'));
 				let port: number;
 				let configFile = await getConfigFile(fileName, 'vite');
 				let previewMode: 'vite' | 'nuxt' = 'vite';
@@ -137,9 +138,9 @@ export async function activate(context: vscode.ExtensionContext) {
 					port = server.port;
 				}
 
-				const root = vscode.workspace.getConfiguration('volar').get<path.PosixPath>('preview.root')!;
-				const relativePath = path.relative(path.resolve(path.dirname(configFile), root), fileName).replace(/\\/g, '/');
-				let url = `http://localhost:${port}/__preview${relativePath}#`;
+				const root = vscode.workspace.getConfiguration('vue-preview').get<path.PosixPath>('root')!;
+				const relativePath = path.relative(path.resolve(path.dirname(configFile), root), fileName).replace(/\\/g, '/') as path.PosixPath;
+				let url = `http://localhost:${port}/${posix.join('__preview' as path.PosixPath, relativePath)}#`;
 
 				if (lastPreviewDocument.isDirty) {
 					url += btoa(lastPreviewDocument.getText());
@@ -169,7 +170,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		new VueComponentPreview(),
 	);
 
-	context.subscriptions.push(vscode.commands.registerCommand('volar.previewMenu', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('vue-preview.previewMenu', async () => {
 
 		const baseOptions: Record<string, vscode.QuickPickItem> = {};
 		const urlOptions: Record<string, vscode.QuickPickItem> = {};
@@ -184,13 +185,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		if (key === 'kill') {
 			for (const terminal of vscode.window.terminals) {
-				if (terminal.name.startsWith('volar-preview:')) {
+				if (terminal.name.startsWith('vue-preview:')) {
 					terminal.dispose();
 				}
 			}
 		}
 		if (key === 'browser') {
-			vscode.env.openExternal(vscode.Uri.parse('http://localhost:' + statusBar.text.split(':')[2].trim()));
+			vscode.env.openExternal(vscode.Uri.parse('http://localhost:' + statusBar.text.split(':')[1].trim()));
 		}
 		if (key === 'highlight-on') {
 			highlightDomElements = true;
@@ -205,7 +206,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			}
 		}
 	}));
-	context.subscriptions.push(vscode.commands.registerCommand('volar.action.vite', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('vue-preview.action.vite', async () => {
 
 		const editor = vscode.window.activeTextEditor;
 		if (!editor)
@@ -233,14 +234,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		openPreview(select as PreviewType, editor.document.fileName as path.OsPath, 'vite');
 	}));
-	context.subscriptions.push(vscode.commands.registerCommand('volar.action.nuxt', async () => {
+	context.subscriptions.push(vscode.commands.registerCommand('vue-preview.action.nuxt', async () => {
 
 		const editor = vscode.window.activeTextEditor;
 		if (!editor)
 			return;
 
 		const viteConfigFile = await getConfigFile(editor.document.fileName as path.OsPath, 'nuxt');
-		const root = vscode.workspace.getConfiguration('volar').get<path.PosixPath>('preview.root')!;
+		const root = vscode.workspace.getConfiguration('vue-preview').get<path.PosixPath>('root')!;
 		const select = await quickPick({
 			[PreviewType.Webview]: {
 				label: 'Preview Nuxt App',
@@ -301,8 +302,8 @@ export async function activate(context: vscode.ExtensionContext) {
 			const viteConfigFile = await getConfigFile(vscode.window.activeTextEditor.document.fileName as path.OsPath, 'vite');
 			const nuxtConfigFile = await getConfigFile(vscode.window.activeTextEditor.document.fileName as path.OsPath, 'nuxt');
 
-			vscode.commands.executeCommand('setContext', 'volar.foundViteDir', viteConfigFile !== undefined);
-			vscode.commands.executeCommand('setContext', 'volar.foundNuxtDir', nuxtConfigFile !== undefined);
+			vscode.commands.executeCommand('setContext', 'vue-preview.foundViteDir', viteConfigFile !== undefined);
+			vscode.commands.executeCommand('setContext', 'vue-preview.foundNuxtDir', nuxtConfigFile !== undefined);
 		}
 	}
 
@@ -329,7 +330,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		if (!configFile)
 			return;
 
-		let terminal = vscode.window.terminals.find(terminal => terminal.name.startsWith('volar-preview:'));
+		let terminal = vscode.window.terminals.find(terminal => terminal.name.startsWith('vue-preview:'));
 		let port: number;
 
 		if (terminal) {
@@ -370,9 +371,9 @@ export async function activate(context: vscode.ExtensionContext) {
 			loadingPanel.webview.html = getWebviewContent(`http://localhost:${port}`, undefined, 'openExternal');
 		}
 		else if (previewType === PreviewType.ExternalBrowser_Component) {
-			const root = vscode.workspace.getConfiguration('volar').get<path.PosixPath>('preview.root')!;
-			const relativePath = path.relative(path.resolve(path.dirname(configFile), root), fileName).replace(/\\/g, '/');
-			loadingPanel.webview.html = getWebviewContent(`http://localhost:${port}/__preview${relativePath}`, undefined, 'openExternal');
+			const root = vscode.workspace.getConfiguration('vue-preview').get<path.PosixPath>('root')!;
+			const relativePath = path.relative(path.resolve(path.dirname(configFile), root), fileName).replace(/\\/g, '/') as path.PosixPath;
+			loadingPanel.webview.html = getWebviewContent(`http://localhost:${port}/${posix.join('__preview' as path.PosixPath, relativePath)}`, undefined, 'openExternal');
 		}
 		else if (previewType === PreviewType.Webview) {
 			loadingPanel.webview.html = getWebviewContent(`http://localhost:${port}`, undefined, 'openSimpleBrowser');
@@ -438,8 +439,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	async function startPreviewServer(viteDir: string, type: 'vite' | 'nuxt') {
 
-		const port = await getLocalHostAvailablePort(vscode.workspace.getConfiguration('volar').get('preview.port')!);
-		let script = await vscode.workspace.getConfiguration('volar').get<string>('preview.script.' + (type === 'nuxt' ? 'nuxi' : 'vite')) ?? '';
+		const port = await getLocalHostAvailablePort(vscode.workspace.getConfiguration('vue-preview').get('port')!);
+		let script = await vscode.workspace.getConfiguration('vue-preview').get<string>('script.' + (type === 'nuxt' ? 'nuxi' : 'vite')) ?? '';
 
 		if (script.indexOf('{VITE_BIN}') >= 0) {
 			script = script.replace('{VITE_BIN}', JSON.stringify(require.resolve('./dist/bin/vite', { paths: [context.extensionPath] })));
@@ -452,7 +453,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 
 		const terminal = vscode.window.createTerminal({
-			name: 'volar-preview:' + type + ':' + port,
+			name: 'vue-preview:' + type + ':' + port,
 			isTransient: true,
 		});
 		terminal.sendText(`cd ${JSON.stringify(viteDir)}`);
@@ -489,14 +490,14 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	function getWebviewContent(url: string, bg?: string, onLoadEvent?: 'openExternal' | 'openSimpleBrowser') {
 
-		const configs = vscode.workspace.getConfiguration('volar');
+		const configs = vscode.workspace.getConfiguration('vue-preview');
 
 		let html = `
 			<style>
 			body {
 				padding: 0;
-				background-color: ${configs.get('preview.backgroundColor')};
-				${bg && configs.get('preview.transparentGrid') ? `background-image: url(${bg});` : ''}
+				background-color: ${configs.get('backgroundColor')};
+				${bg && configs.get('transparentGrid') ? `background-image: url(${bg});` : ''}
 			}
 			</style>
 

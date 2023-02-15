@@ -91,11 +91,11 @@ function createViteConfig() {
 	let proxyConfigContent = fs.readFileSync(path.resolve(__dirname, 'vite', 'config.ts'), { encoding: 'utf8' });
 	proxyConfigContent = proxyConfigContent.replace('{CONFIG_PATH}', JSON.stringify(path.resolve(workspace, 'vite.config')));
 
-	if (!fs.existsSync(path.resolve(workspace, 'node_modules', '.volar'))) {
-		fs.mkdirSync(path.resolve(workspace, 'node_modules', '.volar'));
+	if (!fs.existsSync(path.resolve(workspace, 'node_modules', '.vue-preview'))) {
+		fs.mkdirSync(path.resolve(workspace, 'node_modules', '.vue-preview'));
 	}
 
-	const proxyConfigPath = path.resolve(workspace, 'node_modules', '.volar', 'vite.config.ts');
+	const proxyConfigPath = path.resolve(workspace, 'node_modules', '.vue-preview', 'vite.config.ts');
 	fs.writeFileSync(proxyConfigPath, proxyConfigContent);
 
 	process.argv.push('--config', proxyConfigPath);

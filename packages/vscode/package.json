@@ -29,7 +29,7 @@
 					"id": "vueComponentPreview",
 					"name": "Vue Component Preview",
 					"type": "webview",
-					"when": "volar.foundViteDir || volar.foundNuxtDir"
+					"when": "vue-preview.foundViteDir || vue-preview.foundNuxtDir"
 				}
 			]
 		},
@@ -43,32 +43,32 @@
 		],
 		"configuration": {
 			"type": "object",
-			"title": "Volar",
+			"title": "Vue Preview",
 			"properties": {
-				"volar.preview.script.vite": {
+				"vue-preview.script.vite": {
 					"type": "string",
 					"default": "node {VITE_BIN} --port={PORT}"
 				},
-				"volar.preview.script.nuxi": {
+				"vue-preview.script.nuxi": {
 					"type": "string",
 					"default": "node {NUXI_BIN} dev --port {PORT}"
 				},
-				"volar.preview.port": {
+				"vue-preview.port": {
 					"type": "number",
 					"default": 3333,
 					"description": "Default port for component preview server."
 				},
-				"volar.preview.root": {
+				"vue-preview.root": {
 					"type": "string",
 					"default": ".",
 					"description": "Component preview root directory. (For Nuxt, it should be \"./src\" by default.)"
 				},
-				"volar.preview.backgroundColor": {
+				"vue-preview.backgroundColor": {
 					"type": "string",
 					"default": "#fff",
 					"description": "Component preview background color."
 				},
-				"volar.preview.transparentGrid": {
+				"vue-preview.transparentGrid": {
 					"type": "boolean",
 					"default": false,
 					"description": "Component preview background style."
@@ -77,38 +77,38 @@
 		},
 		"commands": [
 			{
-				"command": "volar.action.vite",
+				"command": "vue-preview.action.vite",
 				"title": "Experimental Features for Vite",
-				"category": "Volar",
+				"category": "Vue Preview",
 				"icon": "images/vite-logo.svg"
 			},
 			{
-				"command": "volar.action.nuxt",
+				"command": "vue-preview.action.nuxt",
 				"title": "Experimental Features for Nuxt",
-				"category": "Volar",
+				"category": "Vue Preview",
 				"icon": "images/nuxt-logo.svg"
 			}
 		],
 		"menus": {
 			"commandPalette": [
 				{
-					"command": "volar.action.vite",
+					"command": "vue-preview.action.vite",
 					"when": "editorLangId == vue"
 				},
 				{
-					"command": "volar.action.nuxt",
+					"command": "vue-preview.action.nuxt",
 					"when": "editorLangId == vue"
 				}
 			],
 			"editor/title": [
 				{
-					"command": "volar.action.vite",
-					"when": "editorLangId == vue && config.volar.icon.preview && volar.foundViteDir",
+					"command": "vue-preview.action.vite",
+					"when": "editorLangId == vue && vue-preview.foundViteDir",
 					"group": "navigation"
 				},
 				{
-					"command": "volar.action.nuxt",
-					"when": "editorLangId == vue && config.volar.icon.preview && volar.foundNuxtDir",
+					"command": "vue-preview.action.nuxt",
+					"when": "editorLangId == vue && vue-preview.foundNuxtDir",
 					"group": "navigation"
 				}
 			]

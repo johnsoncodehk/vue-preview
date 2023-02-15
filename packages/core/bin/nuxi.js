@@ -23,11 +23,11 @@ import('file://' + nuxiBinPath);
 
 function createNuxtPlugin() {
 
-	if (!fs.existsSync(path.resolve(workspace, 'node_modules', '.volar'))) {
-		fs.mkdirSync(path.resolve(workspace, 'node_modules', '.volar'));
+	if (!fs.existsSync(path.resolve(workspace, 'node_modules', '.vue-preview'))) {
+		fs.mkdirSync(path.resolve(workspace, 'node_modules', '.vue-preview'));
 	}
 
-	const proxyConfigPath = path.resolve(workspace, 'node_modules', '.volar', 'nuxt.plugin.ts');
+	const proxyConfigPath = path.resolve(workspace, 'node_modules', '.vue-preview', 'nuxt.plugin.ts');
 	const pluginContent = fs.readFileSync(path.resolve(__dirname, 'nuxi', 'plugin.ts'), { encoding: 'utf8' });
 
 	fs.writeFileSync(proxyConfigPath, pluginContent);
