@@ -13,10 +13,6 @@
 		"directory": "packages/core"
 	},
 	"main": "out/index.js",
-	"bin": {
-		"volar-preview-vite": "./bin/vite.js",
-		"volar-preview-nuxi": "./bin/nuxi.js"
-	},
 	"devDependencies": {
 		"@types/ws": "^8.5.4"
 	},
